@@ -1,0 +1,47 @@
+detecteur-similarite/
+├── pom.xml
+├── README.md
+├── rapport/                      (rapport de 3 pages max)
+├── tests-data/
+│   ├── reference/                Reference.java
+│   ├── identique/
+│   ├── commentaire-ajoute/
+│   ├── ligne-modifiee/
+│   ├── sans-rapport/
+│   └── invalides/                fichier vide, fichier binaire
+└── src/
+    ├── main/
+    │   ├── java/
+    │   │   ├── module-info.java  (si tu utilises les modules)
+    │   │   └── com/similarite/
+    │   │       ├── MainApp.java
+    │   │       ├── modele/
+    │   │       │   ├── FichierSource.java
+    │   │       │   ├── Token.java
+    │   │       │   ├── TypeToken.java          (enum)
+    │   │       │   ├── ProgrammeNormalise.java
+    │   │       │   └── ResultatSimilarite.java
+    │   │       ├── io/
+    │   │       │   ├── LecteurFichier.java
+    │   │       │   └── FichierInvalideException.java
+    │   │       ├── traitement/
+    │   │       │   ├── Normaliseur.java
+    │   │       │   └── Tokeniseur.java
+    │   │       ├── comparaison/
+    │   │       │   ├── Comparateur.java        (interface)
+    │   │       │   ├── ComparateurLignesLCS.java
+    │   │       │   ├── ComparateurJaccard.java
+    │   │       │   └── ComparateurNGrammes.java
+    │   │       ├── service/
+    │   │       │   └── ServiceClassement.java
+    │   │       └── ui/
+    │   │           ├── FenetrePrincipaleController.java
+    │   │           └── SurlignageCode.java
+    │   └── resources/
+    │       └── com/similarite/ui/
+    │           ├── fenetre-principale.fxml
+    │           └── style.css
+    └── test/java/com/similarite/
+        ├── NormaliseurTest.java
+        ├── ComparateurLignesLCSTest.java
+        └── ServiceClassementTest.java
