@@ -1,0 +1,6 @@
+{
+    "java.project.referencedLibraries": [
+        "C:\\javafx-sdk-26.0.1\\lib\\*.jar"
+    ],
+    "java.debug.settings.onBuildFailureProceed": true
+}
