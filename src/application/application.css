@@ -1,1 +1,47 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.root {
+    -app-panel: #f3f4f6;
+    -app-border: #d1d5db;
+    -app-text: #1f2937;
+    -app-accent: #2563eb;
+    -app-code-bg: #ffffff;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 13px;
+}
+
+.side-panel {
+    -fx-background-color: -app-panel;
+    -fx-border-color: -app-border;
+    -fx-border-width: 0 1 0 0;
+}
+
+.section-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: -app-text;
+}
+
+.code-area {
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 13px;
+}
+
+.code-area .content {
+    -fx-background-color: -app-code-bg;
+}
+
+.status-bar {
+    -fx-background-color: -app-panel;
+    -fx-border-color: -app-border;
+    -fx-border-width: 1 0 0 0;
+}
+
+.accent-button {
+    -fx-background-color: -app-accent;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.accent-button:disabled {
+    -fx-opacity: 0.45;
+}

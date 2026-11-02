@@ -1,0 +1,64 @@
+Detecteur_Similarite/
+├── .vscode/
+├── .classpath
+├── .project
+├── bin/
+│
+├── src/
+│   ├── application/
+│   │   ├── Main.java
+│   │   └── application.css
+│   │
+│   ├── ui/
+│   │   ├── MainView.java            (fenêtre principale)
+│   │   ├── InputPanel.java          (choix de la référence + des candidats)
+│   │   ├── RankingTable.java        (classement des scores)
+│   │   └── DiffView.java            (code côte à côte, fragments surlignés)
+│   │
+│   ├── model/
+│   │   ├── SourceFile.java          (nom, chemin, langage, contenu)
+│   │   ├── ComparisonResult.java    (candidat + score + fragments)
+│   │   └── SimilarFragment.java     (lignes début/fin dans chaque fichier)
+│   │
+│   ├── io/
+│   │   ├── FileLoader.java          (charge 1 fichier)
+│   │   └── FolderLoader.java        (charge tous les fichiers d'un dossier)
+│   │
+│   ├── preprocess/
+│   │   ├── Normalizer.java          (commentaires, espaces, casse)
+│   │   ├── Tokenizer.java           (découpe en tokens)
+│   │   └── LanguageDetector.java    (détecte .java, .py, .c par extension)
+│   │
+│   ├── algo/
+│   │   ├── SimilarityMeasure.java   (interface : double score(a, b))
+│   │   ├── MeasureRegistry.java     (liste des algos disponibles)
+│   │   ├── niveau1/                 (comparaison textuelle)
+│   │   ├── niveau2/                 (renommage, blocs déplacés)
+│   │   └── niveau3/                 (langages différents)
+│   │
+│   ├── service/
+│   │   ├── ComparisonService.java   (référence contre chaque candidat)
+│   │   └── RankingService.java      (tri du plus au moins similaire)
+│   │
+│   └── util/
+│       └── Constants.java
+│
+├── data/
+│   ├── scenario_01_identiques/
+│   │   ├── reference/               (1 fichier)
+│   │   └── candidats/               (plusieurs fichiers)
+│   ├── scenario_02_modifies/
+│   │   ├── reference/
+│   │   └── candidats/
+│   ├── scenario_03_sans_relation/
+│   │   ├── reference/
+│   │   └── candidats/
+│   └── scenario_04_multilangage/
+│       ├── reference/
+│       └── candidats/
+│
+├── test/                            (tests unitaires des algos)
+├── results/                         (exports : captures, CSV des scores)
+├── docs/
+│   └── rapport/
+└── README.md
