@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import algo.SimilarityAlgorithm;
 import io.FileLoader;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -19,6 +20,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import model.SourceFile;
+import java.util.ArrayList;
+import java.util.Comparator;
+import algo.Level;
 import util.Constants;
 
 public class MainView {
@@ -168,12 +172,7 @@ public class MainView {
 
     // ---------- Comparaison (à brancher plus tard) ----------
 
-    @FXML
-    private void onCompare() {
-        // TODO : appeler ComparisonService puis afficher le classement
-        setStatus("Comparaison de " + candidatesList.getItems().size()
-                + " fichier(s) avec " + algoCombo.getValue() + " (à implémenter)");
-    }
+  
 
     // ---------- Utilitaires ----------
 
@@ -196,6 +195,9 @@ public class MainView {
         compareButton.setDisable(!ready);
     }
 
+
+
+    
     private FileChooser newFileChooser(String title) {
         FileChooser fc = new FileChooser();
         fc.setTitle(title);
@@ -217,4 +219,60 @@ public class MainView {
         a.initOwner(owner());
         a.showAndWait();
     }
+
+
+  // ---------- Comparaison ----------
+
+private static final class Result {
+    final SourceFile file;
+    final double score;
+    Result(SourceFile file, double score) { this.file = file; this.score = score; }
+}
+
+@FXML
+private void onCompare() {
+    if (referenceList.getItems().isEmpty()) {
+        showError("Choisissez d'abord un fichier de référence.");
+        return;
+    }
+    if (algoCombo.getSelectionModel().getSelectedIndex() != 0) {
+        showError("Ce niveau n'est pas encore implémenté.");
+        return;
+    }
+
+    SourceFile reference = referenceList.getItems().get(0);
+    List<Result> results = new ArrayList<>();
+    List<String> skipped = new ArrayList<>();
+
+    for (SourceFile cand : candidatesList.getItems()) {
+        try {
+            double score = SimilarityAlgorithm.similarity(reference, cand, Level.NIVEAU_1);
+            results.add(new Result(cand, score));
+        } catch (IllegalArgumentException ex) {
+            skipped.add(cand.getName());
+        }
+    }
+
+    results.sort(Comparator.comparingDouble((Result r) -> r.score).reversed());
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("Référence : ").append(reference.getName()).append("\n\n");
+    int rank = 1;
+    for (Result r : results) {
+        sb.append(String.format("%d. %-30s %6.2f %%%n", rank++, r.file.getName(), r.score));
+    }
+    if (!skipped.isEmpty()) {
+        sb.append("\nIgnorés (langage différent ou non supporté) :\n");
+        for (String name : skipped) {
+            sb.append("  - ").append(name).append("\n");
+        }
+    }
+
+    previewTitle.setText("Résultats - " + algoCombo.getValue());
+    previewArea.setText(sb.toString());
+    setStatus(results.size() + " comparé(s), " + skipped.size() + " ignoré(s)");
+}
+
+
+
 }
