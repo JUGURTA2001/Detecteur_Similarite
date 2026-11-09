@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ui.MainView" prefWidth="1100" prefHeight="700">
+
+    <fx:define>
+        <ToggleGroup fx:id="themeGroup"/>
+    </fx:define>
+
+    <top>
+        <MenuBar fx:id="menuBar">
+            <menus>
+                <Menu text="Fichier">
+                    <items>
+                        <MenuItem text="Choisir la référence..." onAction="#onChooseReference"/>
+                        <MenuItem text="Ajouter des fichiers..." onAction="#onAddCandidates"/>
+                        <MenuItem text="Ajouter un dossier..." onAction="#onAddFolder"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem text="Tout vider" onAction="#onClearAll"/>
+                        <SeparatorMenuItem/>
+                        <MenuItem text="Quitter" onAction="#onQuit"/>
+                    </items>
+                </Menu>
+                <Menu text="Affichage">
+                    <items>
+                        <RadioMenuItem fx:id="lightThemeItem" text="Thème clair"
+                                       toggleGroup="$themeGroup" selected="true"
+                                       onAction="#onThemeLight"/>
+                        <RadioMenuItem fx:id="darkThemeItem" text="Thème sombre"
+                                       toggleGroup="$themeGroup"
+                                       onAction="#onThemeDark"/>
+                    </items>
+                </Menu>
+                <Menu text="Aide">
+                    <items>
+                        <MenuItem text="À propos" onAction="#onAbout"/>
+                    </items>
+                </Menu>
+            </menus>
+        </MenuBar>
+    </top>
+
+    <left>
+        <VBox styleClass="side-panel" spacing="8" prefWidth="340" minWidth="280">
+            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+            <Label text="Fichier de référence" styleClass="section-title"/>
+            <ListView fx:id="referenceList" prefHeight="44" minHeight="44" maxHeight="44"/>
+            <Button text="Choisir la référence..." maxWidth="Infinity" onAction="#onChooseReference"/>
+
+            <Separator/>
+
+            <Label text="Fichiers à comparer" styleClass="section-title"/>
+            <ListView fx:id="candidatesList" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="6">
+                <Button text="+ Fichiers" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onAddCandidates"/>
+                <Button text="+ Dossier" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onAddFolder"/>
+            </HBox>
+            <HBox spacing="6">
+                <Button text="Retirer" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onRemoveSelected"/>
+                <Button text="Vider" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onClearCandidates"/>
+            </HBox>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="8">
+            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+            <Label fx:id="previewTitle" text="Aperçu" styleClass="section-title"/>
+            <TextArea fx:id="previewArea" editable="false" VBox.vgrow="ALWAYS"
+                      styleClass="code-area"
+                      promptText="Sélectionne un fichier à gauche pour voir son contenu..."/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox styleClass="status-bar" spacing="10" alignment="CENTER_LEFT">
+            <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
+            <Label fx:id="statusLabel" text="Prêt"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Algorithme :"/>
+            <ComboBox fx:id="algoCombo" prefWidth="260"/>
+            <Button fx:id="compareButton" text="Comparer" styleClass="accent-button"
+                    onAction="#onCompare"/>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -1,3 +1,6 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -5,41 +8,68 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Informations du projet -->
     <groupId>dz.univbejaia</groupId>
     <artifactId>detecteur-similarite</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
 
+    <!-- Configuration Java et JavaFX -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>26</maven.compiler.release>
         <javafx.version>26.0.1</javafx.version>
     </properties>
 
+    <!-- Dépendances -->
     <dependencies>
+
+        <!-- JavaFX Controls -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
+        <!-- JavaFX FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
     </dependencies>
 
+    <!-- Configuration de compilation -->
     <build>
+
+        <!-- Dossier contenant les fichiers Java -->
+        <sourceDirectory>src</sourceDirectory>
+
+        <!-- Copier les fichiers FXML et CSS dans target/classes -->
+        <resources>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
         <plugins>
+
+            <!-- Plugin de compilation Java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.1</version>
                 <configuration>
                     <release>26</release>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
 
+            <!-- Plugin d'exécution JavaFX -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -48,6 +78,8 @@
                     <mainClass>application.Main</mainClass>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
+
 </project>

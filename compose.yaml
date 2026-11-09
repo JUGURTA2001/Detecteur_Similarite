@@ -1,9 +1,19 @@
 
 services:
+
   detecteur:
     build:
       context: .
       dockerfile: Dockerfile
+
     image: detecteur-similarite:1.0.0
+
+    container_name: detecteur-similarite
+
     environment:
       DISPLAY: host.docker.internal:0.0
+
+    stdin_open: true
+    tty: true
+
+    restart: "no"

@@ -1,4 +1,3 @@
-
 # syntax=docker/dockerfile:1.7
 
 FROM eclipse-temurin:26-jdk

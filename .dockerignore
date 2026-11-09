@@ -1,25 +1,24 @@
-# Eclipse
-bin/
-.settings/
-.project
-.classpath
-
-# IntelliJ / VS Code
-.idea/
-.vscode/
-*.iml
-
-# Git
-.git/
-.gitignore
 
 # Maven
 target/
 
-# Résultats et fichiers temporaires
-results/
+# VS Code
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Logs
 *.log
 
-# Système
+# OS
 .DS_Store
 Thumbs.db

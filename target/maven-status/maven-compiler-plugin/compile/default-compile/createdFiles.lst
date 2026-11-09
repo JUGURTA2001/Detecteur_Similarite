@@ -1,0 +1,17 @@
+algo\niveau2\Keywords.class
+util\Constants.class
+io\FileLoader.class
+algo\niveau1\Niveau1$Language.class
+algo\niveau2\Keywords$1.class
+model\SourceFile.class
+application\Main.class
+algo\SimilarityAlgorithm.class
+algo\niveau1\Keywords.class
+algo\niveau1\Niveau1$Token.class
+algo\Level.class
+algo\niveau1\Niveau1.class
+algo\niveau1\Keywords$1.class
+ui\MainView.class
+algo\SimilarityAlgorithm$1.class
+algo\niveau2\Niveau2.class
+ui\MainView$Result.class
