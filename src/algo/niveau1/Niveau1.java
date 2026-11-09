@@ -9,14 +9,29 @@ import algo.SimilarityAlgorithm;
 
 public class Niveau1 {
 
-    public enum Language { JAVA, C, CPP, PYTHON, UNKNOWN }
+    public enum Language { JAVA, C, CPP, PYTHON, JS, DART, UNKNOWN }
+
+    // ---------- Chaînes de caractères ----------
 
     private static final String STRING_C =
             "\"\"\"[\\s\\S]*?\"\"\"|\"(?:\\\\.|[^\"\\\\\\n])*\"|'(?:\\\\.|[^'\\\\\\n])*'";
+
     private static final String STRING_PY =
             "\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?'''|\"(?:\\\\.|[^\"\\\\\\n])*\"|'(?:\\\\.|[^'\\\\\\n])*'";
+
+    private static final String STRING_WEB =
+            "\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?'''|`[\\s\\S]*?`"
+            + "|\"(?:\\\\.|[^\"\\\\\\n])*\"|'(?:\\\\.|[^'\\\\\\n])*'";
+
+    // ---------- Identifiants, nombres, symboles ----------
+
     private static final String BODY =
             "|(?<id>[A-Za-z_]\\w*)|(?<num>\\d+(?:\\.\\d+)?)|(?<op>\\S)";
+
+    private static final String BODY_WEB =
+            "|(?<id>[A-Za-z_$][\\w$]*)|(?<num>\\d+(?:\\.\\d+)?)|(?<op>\\S)";
+
+    // ---------- Patterns par famille de langage ----------
 
     private static final Pattern C_LIKE = Pattern.compile(
             "(?<comment>//[^\\n]*|/\\*[\\s\\S]*?\\*/)|(?<str>" + STRING_C + ")" + BODY);
@@ -24,8 +39,13 @@ public class Niveau1 {
     private static final Pattern PYTHON = Pattern.compile(
             "(?<comment>#[^\\n]*)|(?<str>" + STRING_PY + ")" + BODY);
 
+    private static final Pattern JS_DART = Pattern.compile(
+            "(?<comment>//[^\\n]*|/\\*[\\s\\S]*?\\*/)|(?<str>" + STRING_WEB + ")" + BODY_WEB);
+
     private Niveau1() {
     }
+
+    // ---------- Similarité ----------
 
     public static double similarity(String code1, String fileName1,
                                     String code2, String fileName2) {
@@ -33,7 +53,8 @@ public class Niveau1 {
         Language l2 = detectLanguage(fileName2);
 
         if (l1 == Language.UNKNOWN || l2 == Language.UNKNOWN) {
-            throw new IllegalArgumentException("Langage non supporté (java, c, cpp, py)");
+            throw new IllegalArgumentException(
+                    "Langage non supporté (java, c, cpp, py, js, dart)");
         }
         if (family(l1) != family(l2)) {
             throw new IllegalArgumentException("Les deux fichiers doivent avoir le même langage");
@@ -49,12 +70,27 @@ public class Niveau1 {
         return (200.0 * lcs) / (a.length + b.length);
     }
 
+    // ---------- Tokenisation ----------
+
     public static List<String> tokenize(String code, Language lang) {
         List<String> tokens = new ArrayList<>();
         if (code == null) {
             return tokens;
         }
-        Pattern p = (lang == Language.PYTHON) ? PYTHON : C_LIKE;
+
+        Pattern p;
+        switch (lang) {
+            case PYTHON:
+                p = PYTHON;
+                break;
+            case JS:
+            case DART:
+                p = JS_DART;
+                break;
+            default:
+                p = C_LIKE;
+        }
+
         Matcher m = p.matcher(code);
         while (m.find()) {
             if (m.group("comment") != null) {
@@ -65,6 +101,8 @@ public class Niveau1 {
         return tokens;
     }
 
+    // ---------- Détection du langage ----------
+
     public static Language detectLanguage(String fileName) {
         String n = fileName == null ? "" : fileName.toLowerCase();
         if (n.endsWith(".java")) return Language.JAVA;
@@ -72,16 +110,20 @@ public class Niveau1 {
         if (n.endsWith(".h") || n.endsWith(".cpp") || n.endsWith(".cc")
                 || n.endsWith(".hpp") || n.endsWith(".cxx")) return Language.CPP;
         if (n.endsWith(".py")) return Language.PYTHON;
+        if (n.endsWith(".js") || n.endsWith(".mjs")) return Language.JS;
+        if (n.endsWith(".dart")) return Language.DART;
         return Language.UNKNOWN;
     }
 
-    /** C et C++ sont comparables entre eux. */
+    /** Langages comparables entre eux : C et C++ ensemble, les autres séparés. */
     private static int family(Language l) {
         switch (l) {
             case C:
             case CPP:    return 1;
             case JAVA:   return 2;
             case PYTHON: return 3;
+            case JS:     return 4;
+            case DART:   return 5;
             default:     return 0;
         }
     }
