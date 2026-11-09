@@ -1,6 +1,25 @@
+# Eclipse
 bin/
-out/
-.git/
-.vscode/
 .settings/
+.project
+.classpath
+
+# IntelliJ / VS Code
+.idea/
+.vscode/
+*.iml
+
+# Git
+.git/
+.gitignore
+
+# Maven
+target/
+
+# Résultats et fichiers temporaires
 results/
+*.log
+
+# Système
+.DS_Store
+Thumbs.db
