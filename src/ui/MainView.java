@@ -235,10 +235,14 @@ private void onCompare() {
         showError("Choisissez d'abord un fichier de référence.");
         return;
     }
-    if (algoCombo.getSelectionModel().getSelectedIndex() != 0) {
+    Level level;
+switch (algoCombo.getSelectionModel().getSelectedIndex()) {
+    case 0:  level = Level.NIVEAU_1; break;
+    case 1:  level = Level.NIVEAU_2; break;
+    default:
         showError("Ce niveau n'est pas encore implémenté.");
         return;
-    }
+}
 
     SourceFile reference = referenceList.getItems().get(0);
     List<Result> results = new ArrayList<>();
@@ -246,7 +250,7 @@ private void onCompare() {
 
     for (SourceFile cand : candidatesList.getItems()) {
         try {
-            double score = SimilarityAlgorithm.similarity(reference, cand, Level.NIVEAU_1);
+            double score = SimilarityAlgorithm.similarity(reference, cand, level);
             results.add(new Result(cand, score));
         } catch (IllegalArgumentException ex) {
             skipped.add(cand.getName());

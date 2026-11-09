@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import model.SourceFile;
 import algo.niveau1.Niveau1;
+import algo.niveau2.Niveau2;
 
 
 public class SimilarityAlgorithm {
@@ -18,14 +19,18 @@ public class SimilarityAlgorithm {
         Objects.requireNonNull(level, "Le niveau ne doit pas être null");
 
         switch (level) {
-            case NIVEAU_1:
-                return Niveau1.similarity(
-                        reference.getContent(), reference.getName(),
-                        candidate.getContent(), candidate.getName());
-            case BASIC:
-            default:
-                return similarity(reference.getContent(), candidate.getContent());
-        }
+    case NIVEAU_1:
+        return Niveau1.similarity(
+                reference.getContent(), reference.getName(),
+                candidate.getContent(), candidate.getName());
+    case NIVEAU_2:
+        return Niveau2.similarity(
+                reference.getContent(), reference.getName(),
+                candidate.getContent(), candidate.getName());
+    case BASIC:
+    default:
+        return similarity(reference.getContent(), candidate.getContent());
+}
     }
 
     public static double similarity(SourceFile reference, SourceFile candidate) {

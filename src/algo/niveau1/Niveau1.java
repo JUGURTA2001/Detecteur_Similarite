@@ -11,6 +11,23 @@ public class Niveau1 {
 
     public enum Language { JAVA, C, CPP, PYTHON, JS, DART, UNKNOWN }
 
+    /** Un token avec sa position (utile pour le niveau 2). */
+    public static final class Token {
+        public final String text;
+        public final int line;      // ligne de début
+        public final int endLine;   // ligne de fin
+        public final int col;       // colonne de début
+        public final boolean identifier;
+
+        Token(String text, int line, int endLine, int col, boolean identifier) {
+            this.text = text;
+            this.line = line;
+            this.endLine = endLine;
+            this.col = col;
+            this.identifier = identifier;
+        }
+    }
+
     // ---------- Chaînes de caractères ----------
 
     private static final String STRING_C =
@@ -31,7 +48,7 @@ public class Niveau1 {
     private static final String BODY_WEB =
             "|(?<id>[A-Za-z_$][\\w$]*)|(?<num>\\d+(?:\\.\\d+)?)|(?<op>\\S)";
 
-    // ---------- Patterns par famille de langage ----------
+    // ---------- Patterns ----------
 
     private static final Pattern C_LIKE = Pattern.compile(
             "(?<comment>//[^\\n]*|/\\*[\\s\\S]*?\\*/)|(?<str>" + STRING_C + ")" + BODY);
@@ -45,7 +62,7 @@ public class Niveau1 {
     private Niveau1() {
     }
 
-    // ---------- Similarité ----------
+    // ---------- Similarité niveau 1 ----------
 
     public static double similarity(String code1, String fileName1,
                                     String code2, String fileName2) {
@@ -56,7 +73,7 @@ public class Niveau1 {
             throw new IllegalArgumentException(
                     "Langage non supporté (java, c, cpp, py, js, dart)");
         }
-        if (family(l1) != family(l2)) {
+        if (!sameFamily(l1, l2)) {
             throw new IllegalArgumentException("Les deux fichiers doivent avoir le même langage");
         }
 
@@ -73,32 +90,60 @@ public class Niveau1 {
     // ---------- Tokenisation ----------
 
     public static List<String> tokenize(String code, Language lang) {
-        List<String> tokens = new ArrayList<>();
+        List<String> texts = new ArrayList<>();
+        for (Token t : scan(code, lang)) {
+            texts.add(t.text);
+        }
+        return texts;
+    }
+
+    /** Tokens (sans commentaires) avec leur position. */
+    public static List<Token> scan(String code, Language lang) {
+        List<Token> tokens = new ArrayList<>();
         if (code == null) {
             return tokens;
         }
 
-        Pattern p;
-        switch (lang) {
-            case PYTHON:
-                p = PYTHON;
-                break;
-            case JS:
-            case DART:
-                p = JS_DART;
-                break;
-            default:
-                p = C_LIKE;
-        }
+        Matcher m = patternFor(lang).matcher(code);
+        int cursor = 0;
+        int line = 0;
+        int lineStart = 0;
 
-        Matcher m = p.matcher(code);
         while (m.find()) {
+            for (; cursor < m.start(); cursor++) {
+                if (code.charAt(cursor) == '\n') {
+                    line++;
+                    lineStart = cursor + 1;
+                }
+            }
+            int startLine = line;
+            int col = m.start() - lineStart;
+
+            for (; cursor < m.end(); cursor++) {
+                if (code.charAt(cursor) == '\n') {
+                    line++;
+                    lineStart = cursor + 1;
+                }
+            }
+
             if (m.group("comment") != null) {
                 continue; // commentaires ignorés
             }
-            tokens.add(m.group());
+            tokens.add(new Token(m.group(), startLine, line, col, m.group("id") != null));
         }
         return tokens;
+    }
+
+    private static Pattern patternFor(Language lang) {
+        switch (lang) {
+            case PYTHON:
+                return PYTHON;
+            case JS:
+            case DART:
+                return JS_DART;
+            default:
+                return C_LIKE;
+        }
     }
 
     // ---------- Détection du langage ----------
@@ -115,7 +160,11 @@ public class Niveau1 {
         return Language.UNKNOWN;
     }
 
-    /** Langages comparables entre eux : C et C++ ensemble, les autres séparés. */
+    /** C et C++ sont comparables entre eux, les autres langages seulement avec eux-mêmes. */
+    public static boolean sameFamily(Language a, Language b) {
+        return family(a) == family(b);
+    }
+
     private static int family(Language l) {
         switch (l) {
             case C:
