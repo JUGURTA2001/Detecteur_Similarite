@@ -1,192 +1,212 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="ui.MainView" prefWidth="1280" prefHeight="780">
+            fx:controller="ui.MainView" prefWidth="1440" prefHeight="900"
+            styleClass="app-shell">
 
     <fx:define>
         <ToggleGroup fx:id="themeGroup"/>
     </fx:define>
 
     <top>
-        <MenuBar fx:id="menuBar">
-            <menus>
-                <Menu text="Fichier">
-                    <items>
-                        <MenuItem text="Choisir la référence..." onAction="#onChooseReference"/>
-                        <MenuItem text="Ajouter des fichiers..." onAction="#onAddCandidates"/>
-                        <MenuItem text="Ajouter un dossier..." onAction="#onAddFolder"/>
-                        <SeparatorMenuItem/>
-                        <MenuItem text="Tout vider" onAction="#onClearAll"/>
-                        <SeparatorMenuItem/>
-                        <MenuItem text="Quitter" onAction="#onQuit"/>
-                    </items>
-                </Menu>
-                <Menu text="Affichage">
-                    <items>
-                        <RadioMenuItem fx:id="lightThemeItem" text="Thème clair"
-                                       toggleGroup="$themeGroup" selected="true"
-                                       onAction="#onThemeLight"/>
-                        <RadioMenuItem fx:id="darkThemeItem" text="Thème sombre"
-                                       toggleGroup="$themeGroup"
-                                       onAction="#onThemeDark"/>
-                    </items>
-                </Menu>
-                <Menu text="Aide">
-                    <items>
-                        <MenuItem text="À propos" onAction="#onAbout"/>
-                    </items>
-                </Menu>
-            </menus>
-        </MenuBar>
+        <VBox styleClass="top-shell">
+            <MenuBar fx:id="menuBar" styleClass="app-menu">
+                <menus>
+                    <Menu text="Fichier">
+                        <items>
+                            <MenuItem text="Choisir la référence..." onAction="#onChooseReference"/>
+                            <MenuItem text="Ajouter des fichiers..." onAction="#onAddCandidates"/>
+                            <MenuItem text="Ajouter un dossier..." onAction="#onAddFolder"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem text="Tout vider" onAction="#onClearAll"/>
+                            <SeparatorMenuItem/>
+                            <MenuItem text="Quitter" onAction="#onQuit"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Affichage">
+                        <items>
+                            <RadioMenuItem fx:id="lightThemeItem" text="Thème clair"
+                                           toggleGroup="$themeGroup" selected="true"
+                                           onAction="#onThemeLight"/>
+                            <RadioMenuItem fx:id="darkThemeItem" text="Thème sombre"
+                                           toggleGroup="$themeGroup"
+                                           onAction="#onThemeDark"/>
+                        </items>
+                    </Menu>
+                    <Menu text="Aide">
+                        <items><MenuItem text="À propos" onAction="#onAbout"/></items>
+                    </Menu>
+                </menus>
+            </MenuBar>
+            <HBox alignment="CENTER_LEFT" spacing="14" styleClass="page-heading">
+                <VBox spacing="4">
+                    <Label text="ESPACE D’ANALYSE" styleClass="eyebrow"/>
+                    <Label text="Détecteur de similarité" styleClass="page-title"/>
+                    <Label text="Comparez, analysez et explorez vos fichiers sources." styleClass="page-subtitle"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <VBox alignment="CENTER_RIGHT" spacing="4" styleClass="heading-badge">
+                    <Label text="ANALYSE DE CODE" styleClass="badge-title"/>
+                    <Label text="Comparaison multi-niveaux" styleClass="badge-caption"/>
+                </VBox>
+            </HBox>
+        </VBox>
     </top>
 
     <left>
-        <VBox styleClass="side-panel" spacing="8" prefWidth="320" minWidth="260">
-            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
-
-            <Label text="Fichier de référence" styleClass="section-title"/>
-            <ListView fx:id="referenceList" prefHeight="44" minHeight="44" maxHeight="44"/>
-            <Button text="Choisir la référence..." maxWidth="Infinity" onAction="#onChooseReference"/>
-
+        <VBox styleClass="side-panel" spacing="12" prefWidth="286" minWidth="250">
+            <padding><Insets top="18" right="16" bottom="18" left="16"/></padding>
+            <VBox spacing="4">
+                <Label text="VOTRE ESPACE" styleClass="eyebrow"/>
+                <Label text="Fichiers du projet" styleClass="section-title"/>
+                <Label text="Définissez une référence, puis ajoutez les fichiers à comparer." styleClass="side-description" wrapText="true"/>
+            </VBox>
+            <VBox spacing="8" styleClass="file-section">
+                <Label text="01  ·  Référence" styleClass="section-title"/>
+                <ListView fx:id="referenceList" prefHeight="52" minHeight="52" maxHeight="52" styleClass="reference-list"/>
+                <Button text="Choisir la référence" maxWidth="Infinity" styleClass="secondary-button" onAction="#onChooseReference"/>
+            </VBox>
             <Separator/>
-
-            <Label text="Fichiers à comparer" styleClass="section-title"/>
-            <ListView fx:id="candidatesList" VBox.vgrow="ALWAYS"/>
-            <HBox spacing="6">
-                <Button text="+ Fichiers" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onAddCandidates"/>
-                <Button text="+ Dossier" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onAddFolder"/>
-            </HBox>
-            <HBox spacing="6">
-                <Button text="Retirer" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onRemoveSelected"/>
-                <Button text="Vider" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onClearCandidates"/>
-            </HBox>
+            <VBox spacing="8" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="02  ·  Candidats" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="À comparer" styleClass="tiny-label"/>
+                </HBox>
+                <ListView fx:id="candidatesList" VBox.vgrow="ALWAYS" styleClass="candidate-list"/>
+                <HBox spacing="8">
+                    <Button text="+ Fichiers" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onAddCandidates"/>
+                    <Button text="+ Dossier" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onAddFolder"/>
+                </HBox>
+                <HBox spacing="8">
+                    <Button text="Retirer" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onRemoveSelected"/>
+                    <Button text="Vider la liste" HBox.hgrow="ALWAYS" maxWidth="Infinity" onAction="#onClearCandidates"/>
+                </HBox>
+            </VBox>
+            <VBox spacing="5" styleClass="sidebar-note">
+                <Label text="À SAVOIR" styleClass="eyebrow"/>
+                <Label text="Un score élevé indique une proximité à examiner, pas une preuve de plagiat." wrapText="true" styleClass="side-description"/>
+            </VBox>
         </VBox>
     </left>
 
     <center>
-        <VBox spacing="10">
-            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
-
-            <!-- Cartes de statistiques -->
-            <HBox spacing="12">
+        <VBox spacing="16" styleClass="dashboard-content">
+            <padding><Insets top="20" right="22" bottom="18" left="22"/></padding>
+            <HBox spacing="12" styleClass="kpi-row">
                 <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label text="FICHIERS ANALYSÉS" styleClass="kpi-caption"/>
                     <Label fx:id="kpiCount" text="0" styleClass="kpi-value"/>
-                    <Label text="Fichiers comparés" styleClass="kpi-caption"/>
+                    <Label text="Résultats de comparaison" styleClass="kpi-footnote"/>
                 </VBox>
                 <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label text="SCORE MAXIMUM" styleClass="kpi-caption"/>
                     <Label fx:id="kpiMax" text="-" styleClass="kpi-value"/>
-                    <Label text="Score maximum" styleClass="kpi-caption"/>
+                    <Label text="Similarité la plus élevée" styleClass="kpi-footnote"/>
                 </VBox>
                 <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label text="SCORE MOYEN" styleClass="kpi-caption"/>
                     <Label fx:id="kpiAvg" text="-" styleClass="kpi-value"/>
-                    <Label text="Score moyen" styleClass="kpi-caption"/>
+                    <Label text="Sur les fichiers comparés" styleClass="kpi-footnote"/>
                 </VBox>
                 <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label text="SCORE MINIMUM" styleClass="kpi-caption"/>
                     <Label fx:id="kpiMin" text="-" styleClass="kpi-value"/>
-                    <Label text="Score minimum" styleClass="kpi-caption"/>
+                    <Label text="Similarité la plus faible" styleClass="kpi-footnote"/>
                 </VBox>
                 <VBox styleClass="kpi-card" HBox.hgrow="ALWAYS">
+                    <Label text="FICHIERS IGNORÉS" styleClass="kpi-caption"/>
                     <Label fx:id="kpiSkipped" text="0" styleClass="kpi-value"/>
-                    <Label text="Fichiers ignorés" styleClass="kpi-caption"/>
+                    <Label text="Non pris en compte" styleClass="kpi-footnote"/>
                 </VBox>
             </HBox>
 
-            <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                <tabs>
-
-                    <!-- 1. Classement -->
-                    <Tab text="Classement">
-                        <VBox spacing="6">
-                            <padding><Insets top="8" right="0" bottom="0" left="0"/></padding>
-                            <TableView fx:id="resultsTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="colRank" text="#" prefWidth="45"/>
-                                    <TableColumn fx:id="colFile" text="Fichier" prefWidth="220"/>
-                                    <TableColumn fx:id="colLang" text="Langage" prefWidth="90"/>
-                                    <TableColumn fx:id="colTokens" text="Tokens" prefWidth="80"/>
-                                    <TableColumn fx:id="colKeywords" text="Mots-clés" prefWidth="90"/>
-                                    <TableColumn fx:id="colVars" text="Variables / noms" prefWidth="120"/>
-                                    <TableColumn fx:id="colScore" text="Score" prefWidth="200"/>
-                                    <TableColumn fx:id="colLevel" text="Similarité" prefWidth="90"/>
-                                </columns>
-                                <placeholder>
-                                    <Label text="Choisissez une référence, ajoutez des candidats puis cliquez sur Comparer."/>
-                                </placeholder>
-                            </TableView>
-                            <Label styleClass="hint-label" wrapText="true"
-                                   text="Rouge ≥ 70 % · Orange 40–70 % · Vert &lt; 40 %. Un score de similarité n'est pas, à lui seul, une preuve de plagiat."/>
-                        </VBox>
-                    </Tab>
-
-                    <!-- 2. Graphiques -->
-                    <Tab text="Graphiques">
-                        <VBox spacing="6">
-                            <padding><Insets top="8" right="0" bottom="0" left="0"/></padding>
-                            <BarChart fx:id="scoreChart" title="Score de similarité par fichier (%)"
-                                      VBox.vgrow="ALWAYS" legendVisible="false">
-                                <xAxis><CategoryAxis/></xAxis>
-                                <yAxis><NumberAxis side="LEFT" autoRanging="false"
-                                                   lowerBound="0" upperBound="100" tickUnit="20"/></yAxis>
-                            </BarChart>
-                        </VBox>
-                    </Tab>
-
-                    <!-- 3. Mots-clés et variables -->
-                    <Tab text="Mots-clés et variables">
-                        <VBox spacing="8">
-                            <padding><Insets top="8" right="0" bottom="0" left="0"/></padding>
-                            <Label fx:id="selectionLabel" styleClass="section-title"
-                                   text="Sélectionnez un fichier dans le classement."/>
-                            <HBox spacing="10" prefHeight="280" minHeight="240">
-                                <PieChart fx:id="compositionPie" HBox.hgrow="ALWAYS"
-                                          legendSide="BOTTOM" labelsVisible="false"/>
-                                <BarChart fx:id="compareChart" title="Répartition des tokens (%)"
-                                          HBox.hgrow="ALWAYS" legendSide="BOTTOM">
+            <VBox spacing="10" styleClass="results-panel" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="12" styleClass="panel-heading">
+                    <VBox spacing="3">
+                        <Label text="Résultats de l’analyse" styleClass="panel-title"/>
+                        <Label text="Classement, statistiques et aperçu détaillé des fichiers." styleClass="panel-subtitle"/>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="SEUILS" styleClass="eyebrow"/>
+                    <Label text="Élevé ≥ 70 %" styleClass="legend-high"/>
+                    <Label text="Moyen 40–70 %" styleClass="legend-medium"/>
+                    <Label text="Faible &lt; 40 %" styleClass="legend-low"/>
+                </HBox>
+                <TabPane fx:id="tabPane" styleClass="dashboard-tabs" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                    <tabs>
+                        <Tab text="Classement">
+                            <VBox spacing="8" styleClass="tab-content">
+                                <TableView fx:id="resultsTable" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="colRank" text="#" prefWidth="48"/>
+                                        <TableColumn fx:id="colFile" text="Fichier" prefWidth="220"/>
+                                        <TableColumn fx:id="colLang" text="Langage" prefWidth="90"/>
+                                        <TableColumn fx:id="colTokens" text="Tokens" prefWidth="80"/>
+                                        <TableColumn fx:id="colKeywords" text="Mots-clés" prefWidth="90"/>
+                                        <TableColumn fx:id="colVars" text="Variables / noms" prefWidth="125"/>
+                                        <TableColumn fx:id="colScore" text="Score de similarité" prefWidth="210"/>
+                                        <TableColumn fx:id="colLevel" text="Niveau" prefWidth="100"/>
+                                    </columns>
+                                    <placeholder><Label text="Choisissez une référence, ajoutez des candidats puis lancez la comparaison." styleClass="empty-state"/></placeholder>
+                                </TableView>
+                                <Label styleClass="hint-label" wrapText="true" text="Les scores servent d’indicateur d’analyse et doivent être interprétés avec le contexte du code."/>
+                            </VBox>
+                        </Tab>
+                        <Tab text="Graphiques">
+                            <VBox styleClass="tab-content">
+                                <BarChart fx:id="scoreChart" title="Score de similarité par fichier (%)" VBox.vgrow="ALWAYS" legendVisible="false">
                                     <xAxis><CategoryAxis/></xAxis>
-                                    <yAxis><NumberAxis side="LEFT"/></yAxis>
+                                    <yAxis><NumberAxis side="LEFT" autoRanging="false" lowerBound="0" upperBound="100" tickUnit="20"/></yAxis>
                                 </BarChart>
-                            </HBox>
-                            <Label text="Mots-clés les plus utilisés" styleClass="section-title"/>
-                            <TableView fx:id="keywordTable" VBox.vgrow="ALWAYS">
-                                <columns>
-                                    <TableColumn fx:id="kwWord" text="Mot-clé" prefWidth="180"/>
-                                    <TableColumn fx:id="kwRef" text="Référence" prefWidth="120"/>
-                                    <TableColumn fx:id="kwCand" text="Candidat" prefWidth="120"/>
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </Tab>
-
-                    <!-- 4. Aperçu du code -->
-                    <Tab fx:id="previewTab" text="Aperçu du code">
-                        <VBox spacing="8">
-                            <padding><Insets top="8" right="0" bottom="0" left="0"/></padding>
-                            <Label fx:id="previewTitle" text="Aperçu" styleClass="section-title"/>
-                            <TextArea fx:id="previewArea" editable="false" VBox.vgrow="ALWAYS"
-                                      styleClass="code-area"
-                                      promptText="Sélectionnez un fichier à gauche pour voir son contenu..."/>
-                        </VBox>
-                    </Tab>
-
-                </tabs>
-            </TabPane>
+                            </VBox>
+                        </Tab>
+                        <Tab text="Mots-clés &amp; variables">
+                            <VBox spacing="10" styleClass="tab-content">
+                                <Label fx:id="selectionLabel" styleClass="section-title" text="Sélectionnez un fichier dans le classement." wrapText="true"/>
+                                <HBox spacing="12" prefHeight="280" minHeight="240" VBox.vgrow="ALWAYS">
+                                    <PieChart fx:id="compositionPie" HBox.hgrow="ALWAYS" legendSide="BOTTOM" labelsVisible="false" styleClass="chart-card"/>
+                                    <BarChart fx:id="compareChart" title="Répartition des tokens (%)" HBox.hgrow="ALWAYS" legendSide="BOTTOM" styleClass="chart-card">
+                                        <xAxis><CategoryAxis/></xAxis>
+                                        <yAxis><NumberAxis side="LEFT"/></yAxis>
+                                    </BarChart>
+                                </HBox>
+                                <Label text="Mots-clés les plus utilisés" styleClass="section-title"/>
+                                <TableView fx:id="keywordTable" VBox.vgrow="ALWAYS">
+                                    <columns>
+                                        <TableColumn fx:id="kwWord" text="Mot-clé" prefWidth="180"/>
+                                        <TableColumn fx:id="kwRef" text="Référence" prefWidth="120"/>
+                                        <TableColumn fx:id="kwCand" text="Candidat" prefWidth="120"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </Tab>
+                        <Tab fx:id="previewTab" text="Aperçu du code">
+                            <VBox spacing="10" styleClass="tab-content">
+                                <Label fx:id="previewTitle" text="Aperçu du fichier" styleClass="section-title"/>
+                                <TextArea fx:id="previewArea" editable="false" VBox.vgrow="ALWAYS" styleClass="code-area" promptText="Sélectionnez un fichier dans la liste pour afficher son contenu..."/>
+                            </VBox>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </VBox>
         </VBox>
     </center>
 
     <bottom>
-        <HBox styleClass="status-bar" spacing="10" alignment="CENTER_LEFT">
-            <padding><Insets top="8" right="12" bottom="8" left="12"/></padding>
-            <Label fx:id="statusLabel" text="Prêt"/>
+        <HBox styleClass="status-bar" spacing="12" alignment="CENTER_LEFT">
+            <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+            <Label text="ÉTAT" styleClass="eyebrow"/>
+            <Label fx:id="statusLabel" text="Prêt" styleClass="status-message"/>
             <Region HBox.hgrow="ALWAYS"/>
-            <Label text="Algorithme :"/>
-            <ComboBox fx:id="algoCombo" prefWidth="260"/>
-            <Button fx:id="compareButton" text="Comparer" styleClass="accent-button"
-                    onAction="#onCompare"/>
+            <Label text="Algorithme" styleClass="control-label"/>
+            <ComboBox fx:id="algoCombo" prefWidth="250" styleClass="algorithm-picker"/>
+            <Button fx:id="compareButton" text="Lancer la comparaison" styleClass="accent-button" onAction="#onCompare"/>
         </HBox>
     </bottom>
 </BorderPane>
