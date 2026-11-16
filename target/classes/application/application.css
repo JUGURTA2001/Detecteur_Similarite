@@ -45,3 +45,29 @@
 .accent-button:disabled {
     -fx-opacity: 0.45;
 }
+.kpi-card {
+    -fx-background-color: -app-panel;
+    -fx-border-color: -app-border;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 16 10 16;
+    -fx-spacing: 2;
+}
+
+.kpi-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -app-accent;
+}
+
+.kpi-caption {
+    -fx-font-size: 11px;
+    -fx-text-fill: -app-text;
+    -fx-opacity: 0.7;
+}
+
+.hint-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -app-text;
+    -fx-opacity: 0.75;
+}

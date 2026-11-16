@@ -5,6 +5,7 @@ import java.util.Objects;
 import model.SourceFile;
 import algo.niveau1.Niveau1;
 import algo.niveau2.Niveau2;
+import algo.niveau3.Niveau3;
 
 
 public class SimilarityAlgorithm {
@@ -27,6 +28,10 @@ public class SimilarityAlgorithm {
         return Niveau2.similarity(
                 reference.getContent(), reference.getName(),
                 candidate.getContent(), candidate.getName());
+    case NIVEAU_3:
+        return Niveau3.similarity(
+            reference.getContent(), reference.getName(),
+            candidate.getContent(), candidate.getName());
     case BASIC:
     default:
         return similarity(reference.getContent(), candidate.getContent());
