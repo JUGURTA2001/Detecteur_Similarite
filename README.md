@@ -244,9 +244,7 @@ Vérifiez que VcXsrv est démarré, que DISPLAY est correctement configuré et q
 
 Vérifiez les variables d'environnement JAVA_HOME et Path.
 
-## 9. Auteur
 
-**Jugurta Touati**
 
 Université de Béjaïa  
 Master 1 – Génie Logiciel
