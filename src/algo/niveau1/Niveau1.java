@@ -9,9 +9,9 @@ import algo.SimilarityAlgorithm;
 
 public class Niveau1 {
 
-    public enum Language { JAVA, C, CPP, PYTHON, JS, DART, UNKNOWN }
+    public enum Language { JAVA, C, CPP, PYTHON, JS, DART, PASCAL, TEXT, UNKNOWN }
 
-    /** Un token avec sa position (utile pour le niveau 2). */
+    /** Un token avec sa position (utile pour les niveaux 2 et 3). */
     public static final class Token {
         public final String text;
         public final int line;      // ligne de début
@@ -40,6 +40,8 @@ public class Niveau1 {
             "\"\"\"[\\s\\S]*?\"\"\"|'''[\\s\\S]*?'''|`[\\s\\S]*?`"
             + "|\"(?:\\\\.|[^\"\\\\\\n])*\"|'(?:\\\\.|[^'\\\\\\n])*'";
 
+    private static final String STRING_PASCAL = "'(?:''|[^'\\n])*'";
+
     // ---------- Identifiants, nombres, symboles ----------
 
     private static final String BODY =
@@ -59,6 +61,15 @@ public class Niveau1 {
     private static final Pattern JS_DART = Pattern.compile(
             "(?<comment>//[^\\n]*|/\\*[\\s\\S]*?\\*/)|(?<str>" + STRING_WEB + ")" + BODY_WEB);
 
+    private static final Pattern PASCAL = Pattern.compile(
+            "(?<comment>//[^\\n]*|\\{[\\s\\S]*?\\}|\\(\\*[\\s\\S]*?\\*\\))"
+            + "|(?<str>" + STRING_PASCAL + ")" + BODY);
+
+    /** Texte libre : pas de commentaires ni de chaînes, mots Unicode (accents), nombres, symboles. */
+    private static final Pattern TEXT = Pattern.compile(
+            "(?<comment>(?!))|(?<str>(?!))"
+            + "|(?<id>[\\p{L}_][\\p{L}\\p{N}_]*)|(?<num>\\d+(?:[.,]\\d+)?)|(?<op>\\S)");
+
     private Niveau1() {
     }
 
@@ -69,16 +80,14 @@ public class Niveau1 {
         Language l1 = detectLanguage(fileName1);
         Language l2 = detectLanguage(fileName2);
 
-        if (l1 == Language.UNKNOWN || l2 == Language.UNKNOWN) {
-            throw new IllegalArgumentException(
-                    "Langage non supporté (java, c, cpp, py, js, dart)");
-        }
         if (!sameFamily(l1, l2)) {
             throw new IllegalArgumentException("Les deux fichiers doivent avoir le même langage");
         }
 
-        String[] a = tokenize(code1, l1).toArray(new String[0]);
-        String[] b = tokenize(code2, l2).toArray(new String[0]);
+        // les deux fichiers sont découpés avec les mêmes règles
+        Language lang = common(l1, l2);
+        String[] a = tokenize(code1, lang).toArray(new String[0]);
+        String[] b = tokenize(code2, lang).toArray(new String[0]);
 
         if (a.length == 0 && b.length == 0) {
             return 100.0;
@@ -104,6 +113,8 @@ public class Niveau1 {
             return tokens;
         }
 
+        boolean ignoreCase = (lang == Language.PASCAL || lang == Language.TEXT);
+        //choisir le bon pattern pour un langage.
         Matcher m = patternFor(lang).matcher(code);
         int cursor = 0;
         int line = 0;
@@ -129,7 +140,12 @@ public class Niveau1 {
             if (m.group("comment") != null) {
                 continue; // commentaires ignorés
             }
-            tokens.add(new Token(m.group(), startLine, line, col, m.group("id") != null));
+            boolean isId = m.group("id") != null;
+            String text = m.group();
+            if (isId && ignoreCase) {
+                text = text.toLowerCase();   // Pascal et texte : casse sans importance
+            }
+            tokens.add(new Token(text, startLine, line, col, isId));
         }
         return tokens;
     }
@@ -141,6 +157,10 @@ public class Niveau1 {
             case JS:
             case DART:
                 return JS_DART;
+            case PASCAL:
+                return PASCAL;
+            case TEXT:
+                return TEXT;
             default:
                 return C_LIKE;
         }
@@ -149,7 +169,10 @@ public class Niveau1 {
     // ---------- Détection du langage ----------
 
     public static Language detectLanguage(String fileName) {
-        String n = fileName == null ? "" : fileName.toLowerCase();
+        if (fileName == null) {
+            return Language.UNKNOWN;
+        }
+        String n = fileName.toLowerCase();
         if (n.endsWith(".java")) return Language.JAVA;
         if (n.endsWith(".c")) return Language.C;
         if (n.endsWith(".h") || n.endsWith(".cpp") || n.endsWith(".cc")
@@ -157,12 +180,31 @@ public class Niveau1 {
         if (n.endsWith(".py")) return Language.PYTHON;
         if (n.endsWith(".js") || n.endsWith(".mjs")) return Language.JS;
         if (n.endsWith(".dart")) return Language.DART;
-        return Language.UNKNOWN;
+        if (n.endsWith(".pas") || n.endsWith(".pp") || n.endsWith(".dpr")) return Language.PASCAL;
+        return Language.TEXT;   // .txt et tout autre fichier lisible dans le Bloc-notes
     }
 
-    /** C et C++ sont comparables entre eux, les autres langages seulement avec eux-mêmes. */
+    /**
+     * Deux fichiers sont comparables s'ils sont du même langage (C et C++ ensemble),
+     * ou si l'un des deux est un fichier TEXT (il prend alors le langage de l'autre).
+     */
+    //dire si deux fichiers peuvent être comparés aux niveaux 1 et 2.
     public static boolean sameFamily(Language a, Language b) {
+        if (a == Language.UNKNOWN || b == Language.UNKNOWN) {
+            return false;
+        }
+        if (a == Language.TEXT || b == Language.TEXT) {
+            return true;
+        }
         return family(a) == family(b);
+    }
+
+    /** Langage utilisé pour découper les deux fichiers. */
+    public static Language common(Language a, Language b) {
+        if (a == b) return a;
+        if (a == Language.TEXT) return b;
+        if (b == Language.TEXT) return a;
+        return Language.CPP;   // C avec C++
     }
 
     private static int family(Language l) {
@@ -173,6 +215,7 @@ public class Niveau1 {
             case PYTHON: return 3;
             case JS:     return 4;
             case DART:   return 5;
+            case PASCAL: return 6;
             default:     return 0;
         }
     }

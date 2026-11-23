@@ -21,6 +21,12 @@ public final class Keywords {
         "extern","float","for","goto","if","inline","int","long","register","restrict","return",
         "short","signed","sizeof","static","struct","switch","typedef","union","unsigned",
         "void","volatile","while");
+            private static final Set<String> PASCAL = Set.of(
+        "and","array","begin","case","const","div","do","downto","else","end","file","for",
+        "function","goto","if","in","label","mod","nil","not","of","or","packed","procedure",
+        "program","record","repeat","set","then","to","type","until","var","while","with",
+        "integer","real","boolean","char","string","true","false","uses","unit","interface",
+        "implementation","break","continue","exit","write","writeln","read","readln");
 
     private static final Set<String> CPP = Set.of(
         "auto","bool","break","case","catch","char","class","const","constexpr","continue",
@@ -58,6 +64,7 @@ public final class Keywords {
             case PYTHON: return PYTHON.contains(token);
             case JS:     return JS.contains(token);
             case DART:   return DART.contains(token);
+            case PASCAL: return PASCAL.contains(token);
             default:     return false;
         }
     }

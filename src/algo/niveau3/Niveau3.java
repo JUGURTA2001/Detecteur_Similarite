@@ -113,10 +113,9 @@ public class Niveau3 {
                                     String code2, String fileName2) {
         Language l1 = Niveau1.detectLanguage(fileName1);
         Language l2 = Niveau1.detectLanguage(fileName2);
-        if (l1 == Language.UNKNOWN || l2 == Language.UNKNOWN) {
-            throw new IllegalArgumentException(
-                    "Langage non supporté (java, c, cpp, py, js, dart)");
-        }
+
+        // (a) Plus de test UNKNOWN ici : un fichier lisible n'est jamais refusé.
+        // Le test UNKNOWN reste uniquement dans abstractStream() si besoin.
 
         List<String> s1 = build(code1, l1);
         List<String> s2 = build(code2, l2);
@@ -236,8 +235,11 @@ public class Niveau3 {
     private static List<String> build(String code, Language lang) {
         List<Item> items = toItems(Niveau1.scan(code, lang));
         int n = items.size();
+
+        // (b) TEXT est traité comme Python pour le découpage par ligne.
         boolean py = (lang == Language.PYTHON);
-        boolean[] startsLine = lineStarts(items, py);
+        boolean lineBased = py || lang == Language.TEXT;
+        boolean[] startsLine = lineStarts(items, lineBased);
 
         List<String> out = new ArrayList<>();
         List<Integer> indents = new ArrayList<>();
@@ -248,18 +250,20 @@ public class Niveau3 {
             Item it = items.get(i);
             String x = it.text;
 
-            // Python : l'indentation remplace les accolades
-            if (py && startsLine[i]) {
+            // Découpage par ligne : Python via indentation, Texte : une instruction par ligne.
+            if (lineBased && startsLine[i]) {
                 eos(out);
-                if (it.col > indents.get(indents.size() - 1)) {
-                    indents.add(it.col);
-                    out.add(OPEN);
-                    eos(out);
-                } else {
-                    while (indents.size() > 1 && it.col < indents.get(indents.size() - 1)) {
-                        indents.remove(indents.size() - 1);
-                        out.add(CLOSE);
+                if (py) {
+                    if (it.col > indents.get(indents.size() - 1)) {
+                        indents.add(it.col);
+                        out.add(OPEN);
                         eos(out);
+                    } else {
+                        while (indents.size() > 1 && it.col < indents.get(indents.size() - 1)) {
+                            indents.remove(indents.size() - 1);
+                            out.add(CLOSE);
+                            eos(out);
+                        }
                     }
                 }
             }
@@ -277,6 +281,16 @@ public class Niveau3 {
 
             // ----- symboles -----
             if (it.kind == SYM) {
+                // (c) Pascal : "<>" est l'opérateur de différence
+                if (lang == Language.PASCAL
+                        && x.equals("<")
+                        && i + 1 < n
+                        && items.get(i + 1).text.equals(">")) {
+                    out.add("CMP");
+                    i += 2;
+                    continue;
+                }
+
                 switch (x) {
                     case "{":
                         if (!py) { eos(out); out.add(OPEN); eos(out); }
@@ -301,10 +315,10 @@ public class Niveau3 {
                     case "+": case "-": case "*": case "/": case "%": case "//": case "**":
                         out.add("AR");
                         break;
-                    case "#":            // directive de préprocesseur (#include, #define)
+                    case "#":            // directive de préprocesseur
                         i = skipLine(items, i);
                         continue;
-                    case "@":            // annotation / décorateur : on saute le nom
+                    case "@":            // annotation / décorateur
                         i += 2;
                         continue;
                     default:             // ( ) [ ] , . : ? & | -> => :: << >> ... ignorés
@@ -312,6 +326,22 @@ public class Niveau3 {
                 }
                 i++;
                 continue;
+            }
+
+            // (d) Pascal : mots-clés structurels + opérateurs div / mod
+            if (lang == Language.PASCAL) {
+                if (x.equals("begin"))  { out.add(OPEN);  i++; continue; }
+                if (x.equals("end"))    { out.add(CLOSE); i++; continue; }
+                if (x.equals("repeat")) { out.add("LOOP"); i++; continue; }
+                if (x.equals("div") || x.equals("mod")) { out.add("AR"); i++; continue; }
+                if (x.equals("procedure") || x.equals("function")) {
+                    out.add("FUNC");
+                    i++;
+                    if (i < n && items.get(i).kind == ID) {
+                        i++;   // nom de la fonction ignoré
+                    }
+                    continue;
+                }
             }
 
             // ----- mots -----
@@ -329,11 +359,11 @@ public class Niveau3 {
             if (w != null) {
                 out.add(w);
                 if (w.equals("LOOP")) {
-                    i = skipLoopHeader(items, i, py);   // en-tête résumé en LOOP
+                    i = skipLoopHeader(items, i, py);
                 } else if (w.equals("FUNC") && (x.equals("def") || x.equals("function"))) {
                     i++;
                     if (i < n && items.get(i).kind == ID) {
-                        i++;                            // nom de la fonction ignoré
+                        i++;
                     }
                 } else {
                     i++;
@@ -356,7 +386,7 @@ public class Niveau3 {
                 continue;
             }
             if (lower.equals("console") && i + 2 < n && items.get(i + 1).text.equals(".")) {
-                out.add("IO");                          // console.log(...)
+                out.add("IO");
                 i += 3;
                 continue;
             }
@@ -388,7 +418,7 @@ public class Niveau3 {
                 continue;
             }
 
-            // type utilisateur dans une déclaration : "Scanner sc", "Point p"
+            // type utilisateur dans une déclaration
             if (Character.isUpperCase(x.charAt(0)) && i + 1 < n) {
                 Item nx = items.get(i + 1);
                 if (nx.kind == ID && nx.line == it.endLine && !reserved(nx.text, lang)) {
@@ -397,7 +427,7 @@ public class Niveau3 {
                 }
             }
 
-            // définition de fonction/méthode (Java, C, C++, JS, Dart)
+            // définition de fonction/méthode
             if (!py && nextParen && isFunctionDefinition(items, i)) {
                 out.add("FUNC");
                 i++;
@@ -433,10 +463,10 @@ public class Niveau3 {
                 || Keywords.isKeyword(x, lang);
     }
 
-    /** Python : repère les premiers tokens de chaque ligne logique (hors parenthèses). */
-    private static boolean[] lineStarts(List<Item> items, boolean py) {
+    /** Repère les premiers tokens de chaque ligne logique (hors parenthèses). */
+    private static boolean[] lineStarts(List<Item> items, boolean lineBased) {
         boolean[] r = new boolean[items.size()];
-        if (!py) {
+        if (!lineBased) {
             return r;
         }
         int depth = 0;
@@ -466,7 +496,7 @@ public class Niveau3 {
         return j;
     }
 
-    /** for / while : l'en-tête (entre parenthèses, ou jusqu'au ':' en Python) est résumé en LOOP. */
+    /** for / while : l'en-tête est résumé en LOOP. */
     private static int skipLoopHeader(List<Item> items, int i, boolean py) {
         int n = items.size();
         int j = i + 1;
@@ -508,7 +538,6 @@ public class Niveau3 {
         return -1;
     }
 
-    /** items[start] est '<'. Retourne l'indice après le '>' fermant, ou -1 si ce n'est pas un type générique. */
     private static int skipGenerics(List<Item> items, int start) {
         int depth = 0;
         for (int k = start; k < items.size() && k < start + 20; k++) {
@@ -522,7 +551,7 @@ public class Niveau3 {
                 depth -= 2;
             } else if (s.equals("?") || s.equals(",") || s.equals(".") || s.equals("[")
                     || s.equals("]") || s.equals("&") || s.equals("*")) {
-                // autorisés dans une liste d'arguments de type
+                // autorisés
             } else if (t.kind != ID) {
                 return -1;
             }
@@ -543,7 +572,6 @@ public class Niveau3 {
         return -1;
     }
 
-    /** type nom(...) { ... }  ou  type nom(...) => ... */
     private static boolean isFunctionDefinition(List<Item> items, int i) {
         if (i == 0) {
             return false;
@@ -562,7 +590,7 @@ public class Niveau3 {
         int k = close + 1;
         int limit = Math.min(items.size(), k + 8);
         while (k < limit && (items.get(k).kind == ID || items.get(k).text.equals(","))) {
-            k++; // throws X, Y / const / override ...
+            k++;
         }
         if (k >= items.size()) {
             return false;
@@ -585,7 +613,6 @@ public class Niveau3 {
         return r.toArray(new String[0]);
     }
 
-    /** Instructions (OPEN / CLOSE / fin d'instruction servent de séparateurs). */
     private static List<String[]> statements(List<String> stream) {
         List<String[]> res = new ArrayList<>();
         List<String> cur = new ArrayList<>();
@@ -637,7 +664,6 @@ public class Niveau3 {
         return t;
     }
 
-    /** Plus longue sous-séquence commune pondérée (mémoire O(min(n, m))). */
     private static double weightedLcs(String[] a, String[] b) {
         if (a.length == 0 || b.length == 0) {
             return 0;
@@ -665,7 +691,6 @@ public class Niveau3 {
         return previous[b.length];
     }
 
-    /** Apparie chaque instruction de A avec sa meilleure correspondante de B, quel que soit l'ordre. */
     private static double matchStatements(List<String[]> a, List<String[]> b) {
         List<double[]> pairs = new ArrayList<>();
         for (int i = 0; i < a.size(); i++) {

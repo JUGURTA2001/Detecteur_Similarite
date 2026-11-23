@@ -1,9 +1,12 @@
 io\FileLoader.class
 algo\niveau1\Niveau1$Language.class
+ui\MainView$Row.class
 algo\niveau2\Keywords$1.class
 algo\niveau3\Niveau3$Item.class
 model\SourceFile.class
+ui\MainView$1.class
 application\Main.class
+ui\MainView$KeywordRow.class
 algo\niveau1\Niveau1$Token.class
 algo\Level.class
 algo\SimilarityAlgorithm$1.class
@@ -14,5 +17,6 @@ algo\niveau1\Keywords.class
 algo\niveau1\Niveau1.class
 algo\niveau1\Keywords$1.class
 algo\niveau3\Niveau3.class
+service\CodeStats.class
 ui\MainView.class
 algo\niveau2\Niveau2.class

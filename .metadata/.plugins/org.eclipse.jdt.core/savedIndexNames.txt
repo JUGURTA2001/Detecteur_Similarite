@@ -1,0 +1,12 @@
+INDEX VERSION 1.134+C:\Users\touat\Desktop\M1GL\S1\project pa\Detecteur_Similarite\.metadata\.plugins\org.eclipse.jdt.core
+3574187418.index
+129034705.index
+935542798.index
+1865797976.index
+1661498773.index
+1164984236.index
+1851079447.index
+4025408099.index
+1618466724.index
+2482028829.index
+2031928097.index

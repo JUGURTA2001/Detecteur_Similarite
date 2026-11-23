@@ -10,6 +10,7 @@ import algo.niveau1.Niveau1.Language;
 import algo.niveau1.Niveau1.Token;
 
 public class Niveau2 {
+    
 
     private static final String ID = "ID";
 
@@ -25,12 +26,10 @@ public class Niveau2 {
             throw new IllegalArgumentException(
                     "Langage non supporté (java, c, cpp, py, js, dart)");
         }
-        if (!Niveau1.sameFamily(l1, l2)) {
-            throw new IllegalArgumentException("Les deux fichiers doivent avoir le même langage");
-        }
+        
 
         // même jeu de mots-clés pour les deux fichiers (cas C / C++)
-        Language lang = (l1 == l2) ? l1 : Language.CPP;
+        Language lang = Niveau1.common(l1, l2);
 
         List<String[]> a = statements(code1, lang);
         List<String[]> b = statements(code2, lang);
@@ -52,7 +51,7 @@ public class Niveau2 {
         List<String[]> result = new ArrayList<>();
         List<String> current = new ArrayList<>();
 
-        if (lang == Language.PYTHON) {
+        if (lang == Language.PYTHON || lang == Language.TEXT) {
             int depth = 0;
             int prevEndLine = -1;
             for (Token t : tokens) {
@@ -92,11 +91,11 @@ public class Niveau2 {
     }
 
     private static String normalize(Token t, Language lang) {
-        if (t.identifier && !Keywords.isKeyword(t.text, lang)) {
-            return ID; // variable / fonction renommable
-        }
-        return t.text;
+    if (lang != Language.TEXT && t.identifier && !Keywords.isKeyword(t.text, lang)) {
+        return ID;
     }
+    return t.text;
+}
 
     private static void flush(List<String> current, List<String[]> result) {
         if (!current.isEmpty()) {
